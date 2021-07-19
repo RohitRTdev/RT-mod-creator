@@ -20,7 +20,8 @@ int parse_command_line_options(int argc, char** argv)
                 return VERSION;
             else if(STRING_CHECK(1, -h, --help))
                 return HELP;
-
+            else
+                return FILE_OPT;
             break;
         }
         case 4: {
