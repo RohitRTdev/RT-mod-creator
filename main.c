@@ -39,6 +39,9 @@
 #include "reader.h"
 #include "misc.h"
 #include "cmd.h"
+#include "defs.h"
+
+char output_file_name[50];
 
 static void create_def_file_name(char* def_file_name, char* file_name)
 {
@@ -77,13 +80,18 @@ static FILE* get_output_file_name(int argc, char** argv)
 	if(argc == 4 && !strcmp(argv[2], "-o"))
 	{
 		out_fd = fopen(argv[3], "wb+");
+		strncpy(output_file_name, argv[3], MAX_FILE_NAME_SIZE);
 	}
 	else
 	{
 		char def_file_name[50];
 		create_def_file_name(def_file_name, argv[1]);
 		out_fd = fopen(def_file_name, "wb+");
+
+		strncpy(output_file_name, def_file_name, MAX_FILE_NAME_SIZE);
+
 	}
+
 
 	return out_fd;
 }

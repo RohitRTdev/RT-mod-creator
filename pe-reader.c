@@ -30,10 +30,10 @@ static bool verify_pe_file(FILE* pe_fd)
 }
 
 
-void parse_pe_file(FILE* pe_fd, u64* image_entry, rt_sect_info* rt_extra)
+int parse_pe_file(FILE* pe_fd, u64* image_entry, rt_sect_info* rt_extra)
 {
 	if(!verify_pe_file(pe_fd))
-		display_error_message("Invalid PE file!", INVALID_PE_FILE);
+		return INVALID_PE_FILE;
 
 	/* Read PE header */
 
@@ -69,4 +69,6 @@ void parse_pe_file(FILE* pe_fd, u64* image_entry, rt_sect_info* rt_extra)
 			SET_RT_EXTRA(3);
 		}
 	}
+
+	return NO_ERROR;
 }
