@@ -2,7 +2,7 @@ CC :=gcc
 INCLUDE :=include
 CFLAGS :=-c -I$(INCLUDE)
 TARGET :=rtmodx64
-SRC :=$(wildcard *.c */*.c)
+SRC :=$(filter-out test%, $(wildcard *.c */*.c))
 OBJS :=$(patsubst %.c,%.o,$(SRC))
 
 INSTALLDIR := /bin
@@ -25,6 +25,7 @@ build-objects: $(OBJS)
 $(TARGET): $(SRC)
 	$(MAKE) build-objects
 	$(CC) $(OBJS) -o $@
+
 
 
 clean:

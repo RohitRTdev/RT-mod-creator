@@ -3,11 +3,11 @@
 #include "cmd.h"
 #include "error.h"
 #include "misc.h"
+#include "defs.h"
 
+#define PROCESS_FURTHER break
 
-#define STRING_CHECK(index, string1, string2) (!strcmp(argv[index], #string1) || !strcmp(argv[index], #string2))
-
-int parse_command_line_options(int argc, char** argv)
+int parse_command_line_options(int argc, char** argv, size_t* file_args_start)
 {
     switch(argc)
     {
@@ -24,16 +24,8 @@ int parse_command_line_options(int argc, char** argv)
                 return FILE_OPT;
             break;
         }
-        case 4: {
-            if(STRING_CHECK(2, -o, --output))
-                return FILE_OPT;
-            else
-                return INVALID;
-            
-            break;
-        }
         default: {
-            return INVALID;
+            return FILE_OPT;
         }
     }
     return INVALID;
@@ -54,11 +46,11 @@ void service_option(cmd_options option)
             display_version();
             exit(0);
         }
-        case FILE_OPT: {
-            break;
+        case INVALID: {
+            display_error_message("Invalid parameters!", INVALID_PARAMETERS);
         }
         default: {
-            display_error_message("Invalid parameters!", INVALID_PARAMETERS);
+            PROCESS_FURTHER;
         }
     }
 }

@@ -4,6 +4,7 @@
 #define NO_ERROR 0
 #define INVALID_PARAMETERS 1
 #define INVALID_PE_FILE 2
+#define OUTPUT_FILE_MISSING 3
 
 #define ERROR(error_code) (error_code != 0)
 

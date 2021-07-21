@@ -35,84 +35,77 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "error.h"
-#include "reader.h"
 #include "misc.h"
 #include "cmd.h"
 #include "defs.h"
 
-char output_file_name[50];
-
-static void create_def_file_name(char* def_file_name, char* file_name)
+static bool check_arg_opt(char* option)
 {
-	int i;
-	for(i = 0; i < strlen(file_name); i++)
+	if(option[0] == '-')
+		return true;
+	else	
+		return false;
+}
+
+
+static void get_file_args(int argc, char** argv, size_t* number_of_files, size_t* file_args_start, char* output_file_name)
+{
+	int file_start = -1;
+	for(size_t i = 1; i < argc ; i++)
 	{
-		if(file_name[i] == '.')
+		if(STRING_CHECK(i, -o, --output))
 		{
+			if(*number_of_files > 1)
+			{
+				*number_of_files = 0;
+			}
+			else
+			{
+				if(i == argc - 1)
+				{
+					display_error_message("'-o' option mentioned with no output file name", OUTPUT_FILE_MISSING);
+				}
+				strcpy(output_file_name, argv[i+1]);
+				*number_of_files = 1;
+			}
 			break;
 		}
-		else
+		if(!check_arg_opt(argv[i]))
 		{
-			def_file_name[i] = file_name[i];
+			if(file_start == -1)
+			{
+				file_start = i;
+				*file_args_start = i;
+			}
+
+			(*number_of_files)++;
 		}
 	}
-
-	def_file_name[i] = '\0';
-
-	strcat(def_file_name, ".rm");
-}
-static FILE* get_pe_file_descriptor(int argc, char** argv)
-{
-	FILE* pe_fd = NULL;
-	if(argc >= 2)
-	{
-		pe_fd = fopen(argv[1], "rb");
-	}
-
-	return pe_fd;
-}
-
-static FILE* get_output_file_name(int argc, char** argv)
-{
-	FILE* out_fd = NULL;
-
-	if(argc == 4 && !strcmp(argv[2], "-o"))
-	{
-		out_fd = fopen(argv[3], "wb+");
-		strncpy(output_file_name, argv[3], MAX_FILE_NAME_SIZE);
-	}
-	else
-	{
-		char def_file_name[50];
-		create_def_file_name(def_file_name, argv[1]);
-		out_fd = fopen(def_file_name, "wb+");
-
-		strncpy(output_file_name, def_file_name, MAX_FILE_NAME_SIZE);
-
-	}
-
-
-	return out_fd;
 }
 
 
 int main(int argc, char** argv)
 {
+	size_t file_args_start = 0, number_of_files = 0;
 
-	FILE* pe_fd = NULL;
-	FILE* out_fd = NULL;
-
-	cmd_options option = parse_command_line_options(argc, argv);
+	char output_file_name[50] = {'\0'};
+	cmd_options option = parse_command_line_options(argc, argv, &file_args_start);
 	service_option(option);
 
-	pe_fd = get_pe_file_descriptor(argc, argv);
-	out_fd = get_output_file_name(argc, argv);
+	if(option == FILE_OPT)
+		get_file_args(argc ,argv, &number_of_files, &file_args_start, output_file_name);
 
-	if(!pe_fd || !out_fd)
-		display_error_message("Invalid parameter passed!", INVALID_PARAMETERS);
+	if(number_of_files == 0)
+	{
+		display_error_message("No input files", INVALID_PARAMETERS);
+	}
+	else
+	{
+		start_file_processing(argv, file_args_start, number_of_files, output_file_name);
+	}
 
-	start_file_parse(pe_fd, out_fd);
 
 	return 0;
 }

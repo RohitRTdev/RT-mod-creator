@@ -4,15 +4,14 @@
 #include "error.h"
 #include "io.h"
 
-extern char output_file_name[50];
 
 int parse_pe_file(FILE* pe_fd, u64* image_entry, rt_sect_info* rt_extra);
 void create_rt_executable(FILE* out_fd, FILE* pe_fd, rt_sect_info* rt_extra, u64 image_entry);
 
-void start_file_parse(FILE* pe_fd, FILE* out_fd)
+void start_file_parse(FILE* pe_fd, FILE* out_fd, char* output_file_name)
 {
 	rt_sect_info info_array[4] = {0};
-	u64 image_entry;
+	u64 image_entry = 0;
 	
 	int error_code = parse_pe_file(pe_fd, &image_entry, info_array);
 
