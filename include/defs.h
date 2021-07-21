@@ -12,4 +12,6 @@ typedef unsigned long long int u64;
 #define ALIGN(value, boundary) ((value + boundary - 1) & ~(boundary - 1))
 #define STRING_CHECK(index, string1, string2) (!strcmp(argv[index], #string1) || !strcmp(argv[index], #string2))
 
+extern char prog_name[50];
+
 #endif

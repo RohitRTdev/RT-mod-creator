@@ -41,6 +41,8 @@
 #include "cmd.h"
 #include "defs.h"
 
+char prog_name[50];
+
 static bool check_arg_opt(char* option)
 {
 	if(option[0] == '-')
@@ -49,6 +51,21 @@ static bool check_arg_opt(char* option)
 		return false;
 }
 
+static bool check_option_validity(char* option)
+{
+	if(check_arg_opt(option))
+	{
+		for(size_t i = 0 ; i < TOTAL_PRE_INPUT_OPTIONS; i++)
+		{
+			if(!strcmp(option, command_line_options[i]))
+			{
+				display_error_message("Invalid combination of options", INVALID_PARAMETERS);
+			}
+		}
+	}
+
+	return true;
+}
 
 static void get_file_args(int argc, char** argv, size_t* number_of_files, size_t* file_args_start, char* output_file_name)
 {
@@ -59,7 +76,7 @@ static void get_file_args(int argc, char** argv, size_t* number_of_files, size_t
 		{
 			if(*number_of_files > 1)
 			{
-				*number_of_files = 0;
+				display_error_message("Cannot supply multiple input files with '-o' flag", INVALID_PARAMETERS);
 			}
 			else
 			{
@@ -72,7 +89,7 @@ static void get_file_args(int argc, char** argv, size_t* number_of_files, size_t
 			}
 			break;
 		}
-		if(!check_arg_opt(argv[i]))
+		if(!check_arg_opt(argv[i]) || !check_option_validity(argv[i]))
 		{
 			if(file_start == -1)
 			{
@@ -90,12 +107,26 @@ int main(int argc, char** argv)
 {
 	size_t file_args_start = 0, number_of_files = 0;
 
+	strcpy(prog_name, argv[0]);
+
 	char output_file_name[50] = {'\0'};
-	cmd_options option = parse_command_line_options(argc, argv, &file_args_start);
+	cmd_options option = parse_command_line_options(argc, argv, PROCESS_STDIN);
 	service_option(option);
 
+	char** command_line = argv;
+	size_t commands = argc;
+
+	if(option == INPUT_FROM_STDIN)
+	{
+		commands = word_array_length;
+		command_line = stdin_command_line;
+
+		option = parse_command_line_options(commands, command_line, NO_PROCESS_STDIN);
+		service_option(option);
+	}
+	
 	if(option == FILE_OPT)
-		get_file_args(argc ,argv, &number_of_files, &file_args_start, output_file_name);
+		get_file_args(commands ,command_line, &number_of_files, &file_args_start, output_file_name);
 
 	if(number_of_files == 0)
 	{
@@ -103,7 +134,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		start_file_processing(argv, file_args_start, number_of_files, output_file_name);
+		start_file_processing(command_line, file_args_start, number_of_files, output_file_name);
 	}
 
 

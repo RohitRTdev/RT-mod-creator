@@ -2,6 +2,7 @@ CC :=gcc
 INCLUDE :=include
 CFLAGS :=-c -I$(INCLUDE)
 TARGET :=rtmodx64
+VERSION :=1.0
 SRC :=$(filter-out test%, $(wildcard *.c */*.c))
 OBJS :=$(patsubst %.c,%.o,$(SRC))
 
@@ -26,7 +27,8 @@ $(TARGET): $(SRC)
 	$(MAKE) build-objects
 	$(CC) $(OBJS) -o $@
 
-
+change-version:
+	sed -i 's/^Version=.*/Version=$(VERSION)/' resources/version-msg.txt 
 
 clean:
 	rm -rf *.o *.rm

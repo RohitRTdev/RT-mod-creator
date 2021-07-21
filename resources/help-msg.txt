@@ -1,0 +1,14 @@
+----rtmodx64----
+USAGE: rtmodx64 [<OPTIONS>] <FILE(s)> [-o <OUTPUT-FILE>]
+If -o option is not given then a .rm file with same filename as input file will be generated...
+OPTIONS:
+-v or --version: Display version information
+-h or --help: Display this help menu
+-o or --output: Give the output file name(Provided there is only one input file)
+
+NOTES: rtmod does support redirections, which means you can do this:
+somecommand someinput | rtmodx64
+
+However, make sure that the piped output is in proper format, and care must be taken so as to not add any trailing or leading whitespaces.
+Ex: echo --help | ./rtmodx64  -> This is fine
+    echo " --help" | ./rtmodx64 -> This is not fine(as it has leading whitespace)
