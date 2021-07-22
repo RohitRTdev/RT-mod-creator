@@ -9,6 +9,6 @@ OPTIONS:
 NOTES: rtmod does support redirections, which means you can do this:
 somecommand someinput | rtmodx64
 
-However, make sure that the piped output is in proper format, and care must be taken so as to not add any trailing or leading whitespaces.
-Ex: echo --help | ./rtmodx64  -> This is fine
-    echo " --help" | ./rtmodx64 -> This is not fine(as it has leading whitespace)
+Ex: echo --help | ./rtmodx64 
+  OR
+    echo " --help" | ./rtmodx64

@@ -1,12 +1,11 @@
 #include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include "cmd.h"
 #include "error.h"
+#include "cmd.h"
 #include "misc.h"
 #include "defs.h"
 
@@ -63,6 +62,13 @@ static bool retrieve_input_stdin()
     word_array[0] = prog_name;
 
     size_t ch = 0;
+
+    /* Remove leading whitespaces */
+    while(stdin_input_buffer[ch] == ' ' && ch < actual_size)
+    {
+        ch++;
+    }
+
     while(ch < actual_size)
     {
         word_array[word++] = &stdin_input_buffer[ch];
