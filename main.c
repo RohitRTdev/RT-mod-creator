@@ -40,6 +40,7 @@
 #include "misc.h"
 #include "cmd.h"
 #include "defs.h"
+#include "common.h"
 
 char prog_name[50];
 
@@ -55,13 +56,8 @@ static bool check_option_validity(char* option)
 {
 	if(check_arg_opt(option))
 	{
-		for(size_t i = 0 ; i < TOTAL_PRE_INPUT_OPTIONS; i++)
-		{
-			if(!strcmp(option, command_line_options[i]))
-			{
-				display_error_message("Invalid combination of options", INVALID_PARAMETERS);
-			}
-		}
+		if(check_for_string(option, command_line_options, TOTAL_PRE_INPUT_OPTIONS))
+			return false;
 	}
 
 	return true;

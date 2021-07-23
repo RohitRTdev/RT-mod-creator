@@ -9,7 +9,7 @@
 static bool check_null_section(rt_sect_info* section)
 {
 	static rt_sect_info null_structure = {0};
-	if(!memcmp(section, &null_structure, sizeof(null_structure)))
+	if(!memcmp(&section->ptr_to_sect, &null_structure, sizeof(null_structure) - 8))
 		return true;
 	else
 		return false;
@@ -58,25 +58,32 @@ static void copy_section(rt_sect_info* rt_sect, FILE* pe_fd, FILE* out_fd)
 
 /* Having a section with 0 for all fields indicates that the section is not present */
 
-void create_rt_executable(FILE* out_fd, FILE* pe_fd, rt_sect_info* rt_extra, u64 image_entry)
+void create_rt_executable(FILE* out_fd, FILE* pe_fd, rt_sect_info* rt_extra, u64 image_entry, u64 bss_size)
 {
 	/* Fill rt_hdr structure */
 
 	rt_hdr hdr = {0};
 
-	u64 pe_image_base = rt_extra[0].virtual_address;
+	u64 pe_image_base = rt_extra[0].virtual_address;;
 	hdr.image_entry = image_entry - pe_image_base;
 	zero_hdr(out_fd, sizeof(rt_hdr));
 
+	u8 reloc_index = 0;
+
 	/* Copy all the relevant sections */
-	for(u8 arr_index = 0; arr_index < 4; arr_index++)
+	for(u8 arr_index = 0; arr_index < TOTAL_SECTIONS; arr_index++)
 	{
 		if(check_null_section(&rt_extra[arr_index]))
 		{
 			continue;
 		}
 
-		if(arr_index != 2)
+		if(!strcmp(rt_extra[arr_index].sect_name, ".reloc"))
+		{
+			reloc_index = arr_index;
+		}
+		strcpy(hdr.rt_sections[arr_index].sect_name, rt_extra[arr_index].sect_name);
+		if(strcmp(rt_extra[arr_index].sect_name, ".bss"))
 		{
 			hdr.rt_sections[arr_index].ptr_to_sect = ftell(out_fd);
 			hdr.rt_sections[arr_index].size_of_sect = rt_extra[arr_index].size_of_sect;
@@ -95,8 +102,10 @@ void create_rt_executable(FILE* out_fd, FILE* pe_fd, rt_sect_info* rt_extra, u64
 			
 	}
 
-	adjust_reloc_section(out_fd, &hdr.rt_sections[3], pe_image_base);
-	memcpy(hdr.rt_sign, RT_SIGN, 8);
+	hdr.image_size += ALIGN(bss_size , DEFAULT_SECTION_ALIGNMENT);
+
+	adjust_reloc_section(out_fd, &hdr.rt_sections[reloc_index], pe_image_base);
+	memcpy(hdr.rt_sign, RT_SIGN, SIZE_OF_RT_SIGN);
 
 	write_to_file(out_fd, 0, &hdr, sizeof(rt_hdr));
 	

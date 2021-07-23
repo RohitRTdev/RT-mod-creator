@@ -8,6 +8,7 @@
 #pragma pack(1)
 
 typedef struct{
+	char sect_name[8];
 	u64 ptr_to_sect;
 	u64 size_of_sect;
 	u64 virtual_address;
@@ -19,6 +20,9 @@ typedef struct{
 	u64 image_entry;
 	rt_sect_info rt_sections[4];
 }rt_hdr;
+
+#define SIZE_OF_RT_SIGN 8
+#define TOTAL_SECTIONS 4
 
 #pragma pack()
 
