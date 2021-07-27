@@ -6,7 +6,9 @@ VERSION :=1.0
 SRC :=$(filter-out test%, $(wildcard *.c */*.c))
 OBJS :=$(patsubst %.c,%.o,$(SRC))
 
-INSTALLDIR := /bin
+INSTALLDIR :=/usr/bin
+APPDIR :=/var/lib/RT-mod-creator-$(VERSION)
+
 .PHONY: build build-objects clean very-clean install uninstall
 
 define init-uninstall
@@ -40,6 +42,8 @@ install: $(TARGET)
 	@echo Installing $(TARGET)
 	@sudo cp $(TARGET) $(INSTALLDIR)/$(TARGET) 
 	@echo $(TARGET) installation complete..
-
+	@if [ ! -d $(APPDIR) ] ; then sudo mkdir $(APPDIR) ; sudo cp -r resources/ $(APPDIR) ; fi
+	
 uninstall:
+	@sudo rm -rf $(APPDIR)
 	@cd $(INSTALLDIR) && if [ -f $(TARGET) ] ; then $(init-uninstall) ; else echo "$(TARGET) already uninstalled" ; fi

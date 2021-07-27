@@ -4,8 +4,10 @@
 #include "error.h"
 
 #define APP_VERSION "1.0"
-#define HELP_MSG_PATH "resources/help-msg.txt"
-#define VERSION_FILE_PATH "resources/version-msg.txt"
+#define HELP_MSG_PATH_CURRENT "resources/help-msg.txt"
+#define VERSION_FILE_PATH_CURRENT "resources/version-msg.txt"
+#define VERSION_FILE_PATH_SYSTEM "/var/lib/RT-mod-creator-1.0/resources/version-msg.txt"
+#define HELP_MSG_PATH_SYSTEM "/var/lib/RT-mod-creator-1.0/resources/help-msg.txt"
 
 static bool read_file_msg(const char* msg_file_name)
 {
@@ -32,7 +34,11 @@ static bool read_file_msg(const char* msg_file_name)
 
 void display_version()
 {
-    if(!read_file_msg(VERSION_FILE_PATH))
+    if(read_file_msg(VERSION_FILE_PATH_CURRENT) || read_file_msg(VERSION_FILE_PATH_SYSTEM))
+    {
+        
+    }
+    else
     {
         display_error_message("Version message not found!", RESOURCE_NOT_FOUND);
     }
@@ -40,7 +46,10 @@ void display_version()
 
 void display_help()
 {
-    if(!read_file_msg(HELP_MSG_PATH))
+    if(read_file_msg(HELP_MSG_PATH_CURRENT) || read_file_msg(HELP_MSG_PATH_SYSTEM))
+    {
+    }
+    else
     {
         display_error_message("Help message not found!", RESOURCE_NOT_FOUND);
     }
